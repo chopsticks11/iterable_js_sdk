@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Sam's JS SDK Demo</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<style>
+			body{
+				background-color: whitesmoke;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Sam's JS SDK Demo</h1>
+    	<button type="button" onclick="identifyUser()">Create User</button>
+    	<button type="button" onclick="trackEvent()">Custom Event</button>
+    	<button type="button" onclick="showInAppMsg()">Show In App Msg</button>
+    	<div id="inAppMsg"></div>
+
+		<script type="text/javascript">
+			//load js sdk
+			(function () {
+	    		var b = document.createElement('script'); 
+	    		b.type = 'text/javascript'; 
+	    		b.async = true;
+	    		b.src = 'https://js.iterable.com/analytics.js';
+	    		var a = document.getElementsByTagName('script')[0]; 
+	    		a.parentNode.insertBefore(b, a);
+			})();
+
+			//setting api key
+			var _iaq = _iaq || [];
+			_iaq.push(['account', 'ff288e91e5f9442cb6ce6ea238886298']);
+
+			//calling identify user
+			function identifyUser() {
+	            _iaq.push(['identify', 'sam.cao+jssdk@iterable.com', {
+	                "firstName": "Sam",
+	                "isWebUser": true,
+	                "SA_WebUser_Test_Key": "completed"
+	            }]);
+	        }
+
+	        //creating custom event
+	        function trackEvent() {
+	        	identifyUser(); //need to identify the user before tracking an event
+            	_iaq.push(['track', 'webSATestEvent', {
+	                "platform": "web",
+	                "isTestEvent": true,
+	                "url": "https://iterable.com/sa-test/SAM",
+	                "secret_code_key": "Code_2022"
+            	}]);
+            }
+
+            //get in-app message and show on the web page
+            function showInAppMsg(){
+				var myHeaders = new Headers();
+				myHeaders.append("API_Key", "ff288e91e5f9442cb6ce6ea238886298");
+				myHeaders.append("Content-Type", "text/plain");
+
+				var requestOptions = {
+				  method: 'GET',
+				  headers: myHeaders
+				};
+
+				fetch("https://api.iterable.com/api/inApp/getMessages?email=%20sam.cao%2Bjssdk%40iterable.com&count=5&platform=Web&SDKVersion=None&packageName=None\n", requestOptions)
+				  .then(response => response.text())
+				  .then(result => {
+				  	jsonData = JSON.parse(result);
+				  	console.log('jsonData', jsonData)
+
+					//Render the "html" "content" of the in-app message on the web page
+					document.getElementById("inAppMsg").innerHTML = jsonData.inAppMessages[0].content.html;
+				  })
+				  .catch(error => console.log('error', error));
+			}
+		</script>
+		
+	</body>
+</html>
